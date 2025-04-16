@@ -1,14 +1,12 @@
 package com.quiz.server.model;
 
-import com.quiz.server.enums.Role;
+import java.sql.Date;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,22 +14,20 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "users")
-@NoArgsConstructor
+@Table(name = "tokens")
 @AllArgsConstructor
+@NoArgsConstructor
 @Getter
 @Setter
-public class User {
+public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String username;
+    @OneToOne
+    private User user;
 
-    @Column(nullable = false,unique = true)
-    private String email;
+    private String refreshToken;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private Date expiryDate;
 }
