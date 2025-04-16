@@ -29,11 +29,11 @@ public class JWTUtil {
     public String generateToken(User user,long expirationTime){
         return Jwts
                     .builder()
-                    .claim("username", user.getUsername())
+                    .setSubject( user.getUsername())
                     .claim("email", user.getEmail())
                     .claim("role", user.getRole())
                     .setIssuedAt(new Date())
-                    .setExpiration(new Date(System.currentTimeMillis()+refreshTime))
+                    .setExpiration(new Date(System.currentTimeMillis()+expirationTime))
                     .signWith(getSigningKey(),SignatureAlgorithm.HS256)
                     .compact();
     }
@@ -42,7 +42,7 @@ public class JWTUtil {
     public Map<String,String> generateTokens(User user){
         Map<String,String> tokens=new HashMap<>();
         tokens.put("accessToken", generateToken(user, accessTime));
-        tokens.put("refreshToken", generateToken(user, accessTime));
+        tokens.put("refreshToken", generateToken(user, refreshTime));
         return tokens;
     }
 
