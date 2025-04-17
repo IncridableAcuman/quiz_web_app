@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.quiz.server.dto.AuthRequest;
 import com.quiz.server.dto.AuthResponse;
+import com.quiz.server.dto.LoginRequest;
 import com.quiz.server.enums.Role;
 import com.quiz.server.model.Token;
 import com.quiz.server.model.User;
@@ -58,5 +59,13 @@ public class AuthService {
         .build();
         response.addHeader("Set-Cookie", responseCookie.toString());
         return new AuthResponse(user.getId(),user.getUsername(),user.getEmail(),user.getRole(),jwtUtil.generateToken(user, accessTime),refreshToken);
+   }
+   @Transactional
+   public AuthResponse userSignIn(LoginRequest request,HttpServletResponse response){
+    User user=authRepository.findByEmail(request.getEmail()).orElseThrow(()->new RuntimeException("User not found"));
+    if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+        throw new RuntimeException("Invalid password");
+    }    
+    
    }
 }

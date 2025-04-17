@@ -53,7 +53,7 @@ const Login = () => {
                   <input type="password" placeholder='Password' className='w-full outline-none' />
                 </div>
                 <p className='ml-8 text-gray-500 cursor-pointer hover:underline hover:text-gray-600' onClick={()=>navigate("/forgot-password")}>Forgot Password</p>
-                <button className='flex items-center  cursor-pointer gap-3 mx-auto bg-gradient-to-br from-indigo-500 via-pink-500
+                <button className='flex items-center   cursor-pointer gap-3 mx-auto bg-gradient-to-br from-indigo-500 via-pink-500
                 to-red-500 text-white w-[90%] rounded-full px-4 py-2 text-center'>
                   <Send/>
                   <p>Submit</p>
