@@ -31,33 +31,32 @@ public class AuthService {
     private static final long refreshTime=7*24*60*60*1000;
 
     @Transactional
-    public AuthResponse userSignUp(AuthRequest request,HttpServletResponse response){
-        if(authRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new RuntimeException("User already exist");
-        }
-        User user=new User();
-        user.setUsername(request.getUsername());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(Role.student);
-        authRepository.save(user);
-
-        String refreshToken=jwtUtil.generateToken(user, refreshTime);
-        Token token=new Token();
-        token.setUser(user);
-        token.setRefreshToken(refreshToken);
-        token.setExpiryDate(new Date(System.currentTimeMillis()+refreshTime));
-        tokenRepository.save(token);
-
-        ResponseCookie responseCookie=ResponseCookie.from("refreshToken", refreshToken)
+   public AuthResponse userSignUp(AuthRequest request,HttpServletResponse response){
+    if(authRepository.findByEmail(request.getEmail()).isPresent()){
+        throw new RuntimeException("User already exist");
+    }
+    // user
+    User user=new User();
+    user.setUsername(request.getUsername());
+    user.setEmail(request.getEmail());
+    user.setPassword(passwordEncoder.encode(request.getPassword()));
+    user.setRole(Role.student);
+    authRepository.save(user);
+    // Token 
+    String refreshToken=jwtUtil.generateToken(user, refreshTime);
+    Token token=new Token();
+    token.setUser(user);
+    token.setRefreshToken(refreshToken);
+    token.setExpiryDate(new Date(System.currentTimeMillis()+refreshTime));
+    tokenRepository.save(token);
+    // cookie
+    ResponseCookie responseCookie=ResponseCookie.from("refreshToken", refreshToken)
         .httpOnly(true)
         .secure(false)
         .path("/")
         .maxAge(refreshTime)
         .build();
         response.addHeader("Set-Cookie", responseCookie.toString());
-        String accessToken=jwtUtil.generateToken(user, accessTime);
-        return new AuthResponse(user.getId(), user.getUsername(), user.getEmail(),user.getRole(), accessToken, refreshToken);
-    }
-
+        return new AuthResponse(user.getId(),user.getUsername(),user.getEmail(),user.getRole(),jwtUtil.generateToken(user, accessTime),refreshToken);
+   }
 }
