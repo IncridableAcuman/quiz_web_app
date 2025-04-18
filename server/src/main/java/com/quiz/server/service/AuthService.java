@@ -17,7 +17,6 @@ import com.quiz.server.repository.TokenRepository;
 import com.quiz.server.util.JWTUtil;
 
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,7 +30,6 @@ public class AuthService {
     private static final long accessTime=15*60*1000;
     private static final long refreshTime=7*24*60*60*1000;
 
-    @Transactional
    public AuthResponse userSignUp(AuthRequest request,HttpServletResponse response){
     if(authRepository.findByEmail(request.getEmail()).isPresent()){
         throw new RuntimeException("User already exist");
@@ -60,12 +58,63 @@ public class AuthService {
         response.addHeader("Set-Cookie", responseCookie.toString());
         return new AuthResponse(user.getId(),user.getUsername(),user.getEmail(),user.getRole(),jwtUtil.generateToken(user, accessTime),refreshToken);
    }
-   @Transactional
-   public AuthResponse userSignIn(LoginRequest request,HttpServletResponse response){
-    User user=authRepository.findByEmail(request.getEmail()).orElseThrow(()->new RuntimeException("User not found"));
-    if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-        throw new RuntimeException("Invalid password");
-    }    
-    
-   }
+    public AuthResponse userSignIn(LoginRequest request,HttpServletResponse response){
+        User user=authRepository.findByEmail(request.getEmail()).orElseThrow(()->new RuntimeException("User not found"));
+        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new RuntimeException("Invalid password");
+        } 
+        String accessToken=jwtUtil.generateToken(user, accessTime);
+        Token token=tokenRepository.findByUser(user)
+        .orElseGet(()->{
+            Token tokenData=new Token();
+            tokenData.setUser(user);
+            tokenData.setRefreshToken(jwtUtil.generateToken(user, refreshTime));
+            tokenData.setExpiryDate(new Date(System.currentTimeMillis()+refreshTime));
+            return tokenRepository.save(tokenData);
+        });
+        ResponseCookie responseCookie=ResponseCookie.from("refreshToken", token.getRefreshToken())
+        .httpOnly(true)
+        .secure(false)
+        .path("/")
+        .maxAge(refreshTime)
+        .build();
+        response.addHeader("refreshToken", responseCookie.toString());
+        return new AuthResponse(user.getId(),user.getUsername(),user.getEmail(),user.getRole(),accessToken,token.getRefreshToken());
+    }
+    public AuthResponse refresh(String refreshToken,HttpServletResponse response){
+        if(refreshToken==null || refreshToken.isEmpty()){
+            throw new RuntimeException("Token is missing");
+        }
+        if(!jwtUtil.validateToken(refreshToken)){
+            throw new RuntimeException("Invalid token");
+        }
+        String username;
+        try {
+            username=jwtUtil.extractEmail(refreshToken);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not extract email from token");
+        }
+        User user=authRepository.findByUsername(username).orElseThrow(()->new RuntimeException("User not found"));
+
+        Token token=tokenRepository.findByUser(user).orElseThrow(()->new RuntimeException("Invalid token"));
+        if(token.getRefreshToken().equals(refreshToken)){
+            throw new RuntimeException("Token is mismatch");
+        }
+
+        String newAccessToken=jwtUtil.generateToken(user, accessTime);
+        String newRefreshToken=jwtUtil.generateToken(user, refreshTime);
+        token.setUser(user);
+        token.setRefreshToken(refreshToken);
+        token.setExpiryDate(new Date(System.currentTimeMillis()+refreshTime));
+        tokenRepository.save(token);
+
+        ResponseCookie responseCookie=ResponseCookie.from("refreshToken", newRefreshToken)
+        .httpOnly(true)
+        .secure(false)
+        .path("/")
+        .maxAge(refreshTime)
+        .build();
+        response.addHeader("refreshToken", responseCookie.toString());
+        return new AuthResponse(user.getId(),user.getUsername(),user.getEmail(),user.getRole(),newAccessToken,newAccessToken);
+    }   
 }

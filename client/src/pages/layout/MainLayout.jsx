@@ -1,8 +1,8 @@
 import React from 'react'
 import Sidebar from '../../components/sidebar/Sidebar'
 import MainNavbar from '../../components/navbar/MainNavbar'
-import { Outdent } from 'lucide-react'
-
+import {Outlet} from 'react-router-dom'
+import QuizCards from '../../components/card/QuizCards'
 const MainLayout = () => {
   return (
     <>
@@ -11,8 +11,11 @@ const MainLayout = () => {
       <div className="flex-1">
         <MainNavbar/>
         <main className='p-4'>
-          <Outdent/>
+          <Outlet/>  
         </main>
+        <div className="mt-32 px-8">
+          <QuizCards/>
+        </div>
       </div>
     </div>
     </>

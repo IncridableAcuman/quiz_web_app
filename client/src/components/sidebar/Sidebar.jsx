@@ -1,14 +1,14 @@
-import { Book, BookA, Code2, Contact, FileQuestion, Info, TestTube } from 'lucide-react'
+import { Book, BookA, Code2, Contact, FileQuestion, Info, TestTube, UserCircle } from 'lucide-react'
 import React from 'react'
 
 const Sidebar = () => {
   const menuData=[
-    {title:"About",icon:<Info/>,path:"#"},
-    {title:"Students",icon:<Book/>,path:"#"},
-    {title:"Teacher",icon:<BookA/>,path:"#"},
-    {title:"Quizz Tests",icon:<TestTube/>,path:"#"},
-    {title:"Questions",icon:<FileQuestion/>,path:"#"},
-    {title:"Contact",icon:<Contact/>,path:"#"}
+    {title:"About",icon:<Info/>,path:"/about"},
+    {title:"Students",icon:<Book/>,path:"/students"},
+    {title:"Teachers",icon:<BookA/>,path:"/teachers"},
+    {title:"Quizz Tests",icon:<TestTube/>,path:"/tests"},
+    {title:"Questions",icon:<FileQuestion/>,path:"/questions"},
+    {title:"Admin",icon:<UserCircle/>,path:"/admin"}
   ]
   return (
     <>
