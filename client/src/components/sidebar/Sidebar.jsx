@@ -1,7 +1,8 @@
 import { Book, BookA, Code2, Contact, FileQuestion, Info, TestTube, UserCircle } from 'lucide-react'
 import React from 'react'
-
+import {useNavigate} from 'react-router-dom';
 const Sidebar = () => {
+  const navigate=useNavigate();
   const menuData=[
     {title:"About",icon:<Info/>,path:"/about"},
     {title:"Students",icon:<Book/>,path:"/students"},
@@ -16,7 +17,8 @@ const Sidebar = () => {
       <div className='mt-20 flex items-center justify-between p-4'>
         <h1 className='text-2xl font-bold tracking-tight bg-clip-text text-transparent
         bg-gradient-to-r from-indigo-700 via-pink-700 to-red-800'>Menu</h1>
-        <Code2 className=' text-gray-300 cursor-pointer hover:text-white transition'/>
+        <Code2 className=' text-gray-300 cursor-pointer hover:text-white transition'
+        onClick={()=>navigate("/")}/>
       </div>
       {menuData.map((item,index)=>(
         <div className="mt-4" key={index}>

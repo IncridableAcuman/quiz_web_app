@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowRight, Code, Brain, Server } from 'lucide-react'
+import { ArrowRight, Code, Brain, Server, Book, Calculator } from 'lucide-react'
 
 const quizzes = [
   {
@@ -22,6 +22,20 @@ const quizzes = [
     icon: <Brain className="w-6 h-6 text-white" />,
     color: "from-yellow-500 via-orange-500 to-red-500",
     questions: 8,
+  },
+  {
+    title: "English Basic",
+    description: "Reinforce the basic English language skills with a quiz",
+    icon: <Book className="w-6 h-6 text-white" />,
+    color: "from-indigo-700 via-pink-700 to-red-800",
+    questions: 30,
+  },
+  {
+    title: "Math Skills",
+    description: "Reinforce simple but important points of mathematics through tests.",
+    icon: <Calculator className="w-6 h-6 text-white" />,
+    color: "from-gray-600 via-green-700 to-slate-800",
+    questions: 30,
   },
 ]
 

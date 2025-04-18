@@ -116,5 +116,10 @@ public class AuthService {
         .build();
         response.addHeader("refreshToken", responseCookie.toString());
         return new AuthResponse(user.getId(),user.getUsername(),user.getEmail(),user.getRole(),newAccessToken,newAccessToken);
-    }   
+    }  
+    
+    public void userSignOut(String refreshToken){
+        Token token=tokenRepository.findByToken(refreshToken).orElseThrow(()->new RuntimeException("Invalid token"));
+        tokenRepository.delete(token);
+    }
 }
